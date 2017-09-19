@@ -1,0 +1,12 @@
+package com.dp.intelligentplant.mq;
+
+public class ConsumerMessageThread extends Thread {
+	
+	public void run() {
+		try {
+			AQHandler.receiveByListener();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}

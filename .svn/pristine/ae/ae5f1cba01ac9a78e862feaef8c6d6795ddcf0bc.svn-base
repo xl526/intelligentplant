@@ -1,0 +1,9 @@
+package com.dp.intelligentplant.service.api;
+
+import com.dp.intelligentplant.domain.Equipment;
+
+public interface EquipmentService {
+	
+	public Equipment findEquipmentById(Long equipmentId);
+	
+}

@@ -1,0 +1,15 @@
+package com.dp.intelligentplant.service.api;
+
+import com.dp.intelligentplant.domain.Equipment;
+
+public interface EquipmentService {
+	
+	public Equipment findEquipmentById(Long equipmentId);
+	
+	public Iterable<Equipment> listEquipment();
+	
+	public void saveOrUpdateEquipment(Equipment equipment);
+	
+	public void deleteEquipment(Long equipmentId);
+	
+}

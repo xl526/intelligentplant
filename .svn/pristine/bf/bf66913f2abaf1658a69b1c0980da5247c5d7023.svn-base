@@ -1,0 +1,20 @@
+package com.dp.intelligentplant.servlet;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+
+import com.dp.intelligentplant.fbox.FBoxHelper;
+import com.dp.intelligentplant.fbox.SignalRConnectUtil;
+
+@SuppressWarnings("serial")
+public class InitServlet extends HttpServlet {
+	
+	@Override
+	public void init() throws ServletException {
+		System.out.println("容器启动，开启接收SignalR推送消息的线程......");
+		String accessToken = FBoxHelper.login();
+		getServletContext().setAttribute("accessToken", accessToken);
+		SignalRConnectUtil.beginConnect("http://fbcs101.fbox360.com/push", accessToken, "741e41cd6087432f8dc7c913026179a9");
+		
+	}
+}

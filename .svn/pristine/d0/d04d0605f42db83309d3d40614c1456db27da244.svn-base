@@ -1,0 +1,246 @@
+package com.dp.intelligentplant.controller;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.WebApplicationContext;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.dp.intelligentplant.domain.DmonDef;
+import com.dp.intelligentplant.domain.DmonValue;
+import com.dp.intelligentplant.domain.Equipment;
+import com.dp.intelligentplant.domain.EquipmentStatus;
+import com.dp.intelligentplant.fbox.DefVO;
+import com.dp.intelligentplant.fbox.DeviceVO;
+import com.dp.intelligentplant.fbox.DmonValueVO;
+import com.dp.intelligentplant.fbox.FBoxConfig;
+import com.dp.intelligentplant.fbox.FBoxHelper;
+import com.dp.intelligentplant.service.api.DmonDefService;
+import com.dp.intelligentplant.service.api.DmonValueService;
+import com.dp.intelligentplant.service.api.EquipmentService;
+import com.dp.intelligentplant.service.api.EquipmentStatusService;
+import com.dp.intelligentplant.util.EquipmentTypeEnum;
+import com.dp.intelligentplant.util.PageVO;
+import com.dp.intelligentplant.util.ResultInfo;
+import com.dp.intelligentplant.vo.EquipmentStatusVO;
+
+@Controller
+@RequestMapping("/fbox")
+public class FBoxController {
+	
+	@Autowired
+	private EquipmentStatusService equipmentStatusService;
+	
+	@Autowired
+	private EquipmentService equipmentService;
+	
+	@Autowired
+	private DmonDefService dmonDefService;
+	
+	@Autowired
+	private DmonValueService dmonValueService;
+	
+	@RequestMapping("/page")
+	@ResponseBody
+	public Object page(PageVO<EquipmentStatus> pageVO, HttpServletRequest request) {
+		String rangeTime = request.getParameter("rangeTime");
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+		int len = 16;
+		Date startTime = null;
+		Date endTime = null;
+		
+		try {
+			startTime = df.parse(rangeTime.substring(0, len));
+			endTime = df.parse(rangeTime.substring(len + 3));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		
+		EquipmentStatusVO equipmentStatusVO = new EquipmentStatusVO();
+		equipmentStatusVO.setStartTime(startTime);
+		equipmentStatusVO.setEndTime(endTime);
+		
+		Page<EquipmentStatus> page = equipmentStatusService.findByPageAndParams(pageVO, equipmentStatusVO);
+		pageVO.setItemsCount(page.getTotalElements());
+		pageVO.setData(page.getContent());
+		return pageVO;
+	}
+	
+	/**
+	 * 监控点基本信息数据抓取
+	 * @return
+	 */
+	@RequestMapping("/dmon/def")
+	@ResponseBody
+	public Object syncDef() {
+		ResultInfo resultInfo = new ResultInfo();
+		String accessToken = null;
+		String result = null;
+		
+		WebApplicationContext webApplicationContext = ContextLoader.getCurrentWebApplicationContext();
+		ServletContext servletContext = webApplicationContext.getServletContext();
+		Object obj = servletContext.getAttribute("accessToken");
+		if (obj == null) {
+			accessToken = FBoxHelper.login();
+			servletContext.setAttribute("accessToken", accessToken);
+		} else {
+			accessToken = (String) obj;
+		}
+		
+		for (String box_uid : FBoxConfig.BOX_UID_ARRAY) {
+			result = FBoxHelper.listMonitoringSite(accessToken, box_uid);
+			//token过期
+			if (result.contains("Authorization has been denied for this request")) {
+				accessToken = FBoxHelper.login();
+				result = FBoxHelper.listMonitoringSite(accessToken, box_uid);
+				servletContext.setAttribute("accessToken", accessToken);
+			}
+			JSONArray jsonArray = JSONArray.parseArray(result);
+			
+			for (Iterator<Object> iterator = jsonArray.iterator(); iterator.hasNext();) {
+				JSONObject json = (JSONObject) iterator.next();
+				
+				JSONArray jsonArray1 = json.getJSONArray("dMonEntries");
+				for (Iterator<Object> iterator1 = jsonArray1.iterator(); iterator1.hasNext();) {
+					JSONObject json1 = (JSONObject) iterator1.next();
+					DefVO defVO = JSONObject.toJavaObject(json1, DefVO.class);
+					
+					DmonDef dmonDef = new DmonDef();
+					dmonDef.setUid(defVO.getUid());
+					dmonDef.setName(defVO.getName());
+					dmonDef.setDescription(defVO.getDesc());
+					dmonDef.setDataType(defVO.getDataType());
+					dmonDef.setFracDigits(defVO.getFracDigits());
+					dmonDef.setIntDigits(defVO.getIntDigits());
+					dmonDef.setUnit(defVO.getUnit());
+					dmonDef.setDeviceId(defVO.getSrc().getDeviceId());
+					dmonDef.setMainAddr(defVO.getSrc().getMainAddr());
+					dmonDef.setSubAddr(defVO.getSrc().getSubAddr());
+					dmonDef.setSubIndex(defVO.getSrc().getSubIndex());
+					dmonDef.setBoxUid(defVO.getBoxUid());
+					dmonDefService.saveDmonDef(dmonDef);
+					
+				}
+			}
+		}
+		
+		return resultInfo;
+	}
+	
+	/**
+	 * 设备信息数据抓取
+	 * @return
+	 */
+	@RequestMapping("/device")
+	@ResponseBody
+	public Object syncEquipment() {
+		ResultInfo resultInfo = new ResultInfo();
+		String accessToken = null;
+		String result = null;
+		
+		WebApplicationContext webApplicationContext = ContextLoader.getCurrentWebApplicationContext();
+		ServletContext servletContext = webApplicationContext.getServletContext();
+		Object obj = servletContext.getAttribute("accessToken");
+		if (obj == null) {
+			accessToken = FBoxHelper.login();
+			servletContext.setAttribute("accessToken", accessToken);
+		} else {
+			accessToken = (String) obj;
+		}
+		
+		for (String box_uid : FBoxConfig.BOX_UID_ARRAY) {
+			result = FBoxHelper.listDevice(accessToken, box_uid);
+			//token过期
+			if (result.contains("Authorization has been denied for this request")) {
+				accessToken = FBoxHelper.login();
+				result = FBoxHelper.listDevice(accessToken, box_uid);
+				servletContext.setAttribute("accessToken", accessToken);
+			}
+			JSONArray jsonArray = JSONArray.parseArray(result);
+			
+			for (Iterator<Object> iterator = jsonArray.iterator(); iterator.hasNext();) {
+				JSONObject json = (JSONObject) iterator.next();
+				DeviceVO deviceVO = JSONObject.toJavaObject(json, DeviceVO.class);
+				
+				Equipment equipment = new Equipment();
+				equipment.setEno(deviceVO.getDeviceId());
+				equipment.setEname(deviceVO.getDeviceName());
+//				equipment.setType(EquipmentTypeEnum.TYPE_0.getValue());
+				equipmentService.saveOrUpdateEquipment(equipment);
+				
+			}
+		}
+		return resultInfo;
+	}
+	
+	/**
+	 * 监控点当前数据值抓取
+	 * @return
+	 */
+	@RequestMapping("/dmon/value")
+	@ResponseBody
+	public Object syncDmonValue() {
+		ResultInfo resultInfo = new ResultInfo();
+		String accessToken = null;
+		String result = null;
+		
+		WebApplicationContext webApplicationContext = ContextLoader.getCurrentWebApplicationContext();
+		ServletContext servletContext = webApplicationContext.getServletContext();
+		Object obj = servletContext.getAttribute("accessToken");
+		if (obj == null) {
+			accessToken = FBoxHelper.login();
+			servletContext.setAttribute("accessToken", accessToken);
+		} else {
+			accessToken = (String) obj;
+		}
+		
+		String boxNo = FBoxConfig.boxMap.get("7254");
+		//根据boxUid查找盒子下监控点信息
+		List<DmonDef> dmonDefs = dmonDefService.findDmonDefByBoxUid("7254");
+		//将监控点uid放入数组
+		String[] ids = new String[dmonDefs.size()];
+		for (int i = 0; i < ids.length; i++) {
+			ids[i] = dmonDefs.get(i).getUid();
+		}
+		result = FBoxHelper.getBoxDmonValues(accessToken, boxNo, ids);
+		//token过期
+		if (result.contains("Authorization has been denied for this request")) {
+			accessToken = FBoxHelper.login();
+			result = FBoxHelper.getBoxDmonValues(accessToken, boxNo, ids);
+			servletContext.setAttribute("accessToken", accessToken);
+		}
+		
+		JSONArray jsonArray = JSONArray.parseArray(result);
+		for (Iterator<Object> iterator = jsonArray.iterator(); iterator.hasNext();) {
+			JSONObject json = (JSONObject) iterator.next();
+
+			DmonValueVO dmonValueVO = JSONObject.toJavaObject(json, DmonValueVO.class);
+			
+			DmonValue dmonValue = new DmonValue();
+			dmonValue.setUid(dmonValueVO.getId());
+			dmonValue.setName(dmonValueVO.getName());
+			dmonValue.setDataType(dmonValueVO.getDataType());
+			dmonValue.setBoxId(dmonValueVO.getBoxId());
+			dmonValue.setValue(dmonValueVO.getValue());
+			dmonValue.setStatus(dmonValueVO.getStatus());
+			dmonValueService.saveDmonValue(dmonValue);
+		}
+		return resultInfo;
+	}
+	
+}

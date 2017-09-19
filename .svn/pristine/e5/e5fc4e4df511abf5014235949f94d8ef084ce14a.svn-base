@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="import" href="../header.html">
+  <script>
+  $(function () {
+	  $("#nav").load("../nav.html");
+  })
+  </script>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+<div class="wrapper">
+
+  <div id="nav"></div>
+  
+  <div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        	能耗管理
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">能耗管理</li>
+      </ol>
+    </section>
+    
+    <!-- Main content -->
+    <section class="content">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="box box-primary">
+            <div class="box-header with-border">
+              <i class="fa fa-bar-chart-o"></i>
+              <h3 class="box-title">chart1</h3>
+              
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>
+            <div class="box-body">
+              <div id="chart1" style="height:300px"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="box box-info">
+            <div class="box-header with-border">
+              <i class="fa fa-bar-chart-o"></i>
+              <h3 class="box-title">chart2</h3>
+
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>
+            <div class="box-body">
+                <div id="chart2" style="height:300px"></div>
+            </div>
+          </div>
+        </div>
+      </div>   
+      
+      <div class="row">
+      	<div class="box box-info">
+      		<div id="grid"></div>
+      	</div>
+      </div>
+      
+      
+    </section>
+    
+  </div>
+  
+</div>
+<script type="text/javascript" src="../style/js/macarons.js"></script>
+
+<script type="text/javascript">
+$(function () {
+	
+	var name1 = 'opt11';
+	var name2 = 'opt10';
+	
+	// 基于准备好的dom，初始化echarts实例
+    var chart1 = echarts.init(document.getElementById('chart1'), theme);
+    var chart2 = echarts.init(document.getElementById('chart2'), theme);
+
+    // 指定图表的配置项和数据
+    var option1 = {
+    		title: {
+    			text: '电流轴折线'
+    			//subtext: '纯属虚构'
+    		},
+  		    tooltip: {
+  		        trigger: 'axis',
+	        	axisPointer: {
+	              show: true,
+	              type : 'cross',
+	              lineStyle: {
+	                  type : 'dashed',
+	                  width : 1
+	              }
+  		        }
+  		    },
+  		    legend: {
+  		        //orient: 'vertical',
+  		        //x: 'left',
+  		        data:[name1, name2]
+  		    },
+  		  	/* color: [
+  		        '#2ec7c9','#b6a2de','#5ab1ef','#ffb980','#d87a80',
+  		        '#8d98b3','#e5cf0d','#97b552','#95706d','#dc69aa',
+  		        '#07a2a4','#9a7fd1','#588dd5','#f5994e','#c05050',
+  		        '#59678c','#c9ab00','#7eb00a','#6f5553','#c14089'
+  		    ], */
+  		    toolbox: {
+  		    	show: true,
+  		    	feature: {
+  		    		mark : {show: true},
+  		    		dataZoom: {show: true},
+  		            dataView : {show: true, readOnly: false},
+  		            magicType : {show: true, type: ['line', 'bar']},
+  		            restore : {show: true},
+  		            saveAsImage : {show: true}
+  		    	}
+  		    },
+  		    calculable: true,
+  		    xAxis: [
+  		    	{
+  		    		type: 'time'
+  		    		//boundaryGap: false
+  		    	}
+  		    ],
+  		    yAxis: [
+  		    	{
+  		    		type: 'value'
+  		    		/* axisLabel: {
+  		    			formatter: '{value}°C'
+  		    		} */
+  		    	}
+  		    ],
+  		    series: [
+				{
+				    name: name1,
+				    type:'line',
+				    data: []
+				},
+				{
+		            name: name2,
+		            type:'line',
+		            data: []
+		        }
+  		    ]
+  		};
+    
+    var option2 = {
+    		title: {
+    			text: '温度轴折线'
+    			//subtext: '纯属虚构'
+    		},
+  		    tooltip: {
+  		        trigger: 'axis',
+  		        axisPointer: {
+	              show: true,
+	              type : 'cross',
+	              lineStyle: {
+	                  type : 'dashed',
+	                  width : 1
+	              }
+  		        }
+  		    },
+  		    legend: {
+  		        //orient: 'vertical',
+  		        //x: 'left',
+  		        data:[name1, name2]
+  		    },
+  		  	/* color: [
+  		        '#2ec7c9','#b6a2de','#5ab1ef','#ffb980','#d87a80',
+  		        '#8d98b3','#e5cf0d','#97b552','#95706d','#dc69aa',
+  		        '#07a2a4','#9a7fd1','#588dd5','#f5994e','#c05050',
+  		        '#59678c','#c9ab00','#7eb00a','#6f5553','#c14089'
+  		    ], */
+  		    toolbox: {
+  		    	show: true,
+  		    	feature: {
+  		    		mark : {show: true},
+  		    		dataZoom: {show: true},
+  		            dataView : {show: true, readOnly: false},
+  		            magicType : {show: true, type: ['line', 'bar']},
+  		            restore : {show: true},
+  		            saveAsImage : {show: true}
+  		    	}
+  		    },
+  		    calculable: true,
+  		    xAxis: [
+  		    	{
+  		    		type: 'time'
+  		    		//boundaryGap: false
+  		    	}
+  		    ],
+  		    yAxis: [
+  		    	{
+  		    		type: 'value'
+  		    		/* axisLabel: {
+  		    			formatter: '{value}°C'
+  		    		} */
+  		    	}
+  		    ],
+  		    series: [
+				{
+				    name: name1,
+				    type:'line',
+				    areaStyle: {normal: {}},
+				    data: []
+				},
+				{
+		            name: name2,
+		            type:'line',
+		            areaStyle: {normal: {}},
+		            data: []
+		        }
+  		    ]
+  		};
+
+	    // 使用刚指定的配置项和数据显示图表。
+	    chart1.setOption(option1);
+	    chart2.setOption(option2);
+	    
+	    //填充数据
+	    fillData(chart1, chart2);
+	    setInterval(function(){
+	    	fillData(chart1, chart2);
+		}, 10000);
+	    
+	    
+	    //grid列表
+	    var db = {
+  	     		loadData: function(filter){
+  	     			return $.ajax({
+  	     				type: "GET",
+  	     				url: "../equipment/page",
+  	     				data: filter
+  	     			});
+  	     		},
+  	     		insertItem: function(item) {},
+  	     		updateItem: function(item) {},
+  	     		deleteItem: function(item) {}
+	    };
+	    
+	    $("#grid").jsGrid({
+            width: "100%",
+            height: "400px",
+     
+            //inserting: true,
+            //editing: true,
+            sorting: true,
+            paging: true,
+            pageLoading: true,
+            
+            autoload: true,
+            //filtering: true,
+     
+            controller: db,
+            //data: clients1,
+     
+            fields: [
+                { name: "param", title: "param", type: "text", width: 100},
+                { name: "value",title: "value", type: "text", width: 100},
+                { name: "recordTime",title: "记录时间", type: "text"}
+            ]
+        });
+    
+});
+</script>
+<script type="text/javascript">
+function fillData(chart1, chart2){
+	//电流数据
+	$.get('../equipment/chart/current').done(function (data) {
+	    
+	    chart1.setOption({
+	    	
+	        series: [{
+	            data: (function () {
+	                var d = [];
+		               
+	                for (var i = 0; i < data.data1.length; i++) {
+	                	d.push([new Date(data.data1[i].time), data.data1[i].val]);
+	                }
+	                return d;
+	            })()
+	        },{
+	        	data: (function () {
+	                var d = [];
+		               
+	                for (var i = 0; i < data.data2.length; i++) {
+	                	d.push([new Date(data.data2[i].time), data.data2[i].val]);
+	                }
+	                return d;
+	            })()
+	        }]
+	    });
+	});
+	
+	//温度数据
+	$.get('../equipment/chart/temperature').done(function (data) {
+	    
+	    chart2.setOption({
+	    	
+	        series: [{
+	            data: (function () {
+	                var d = [];
+		               
+	                for (var i = 0; i < data.data1.length; i++) {
+	                	d.push([new Date(data.data1[i].time), data.data1[i].val]);
+	                }
+	                return d;
+	            })()
+	        },{
+	        	data: (function () {
+	                var d = [];
+		               
+	                for (var i = 0; i < data.data2.length; i++) {
+	                	d.push([new Date(data.data2[i].time), data.data2[i].val]);
+	                }
+	                return d;
+	            })()
+	        }]
+	    });
+	});
+}
+</script>
+</body>
+</html>

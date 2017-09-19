@@ -1,0 +1,68 @@
+package com.dp.intelligentplant.service.impl;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.servlet.ServletContext;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.WebApplicationContext;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.dp.intelligentplant.fbox.AlarmVO;
+import com.dp.intelligentplant.fbox.FBoxConfig;
+import com.dp.intelligentplant.fbox.FBoxHelper;
+import com.dp.intelligentplant.service.api.AlarmService;
+import com.dp.intelligentplant.util.PageVO;
+
+@Service
+public class AlarmServiceImpl implements AlarmService {
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<AlarmVO> listAlarm() {
+		
+		String accessToken = null;
+		String result = null;
+		List<AlarmVO> list = new ArrayList<AlarmVO>();
+		
+		WebApplicationContext webApplicationContext = ContextLoader.getCurrentWebApplicationContext();
+		ServletContext servletContext = webApplicationContext.getServletContext();
+		Object obj = servletContext.getAttribute("accessToken");
+		if (obj == null) {
+			accessToken = FBoxHelper.login();
+			servletContext.setAttribute("accessToken", accessToken);
+		} else {
+			accessToken = (String) obj;
+		}
+		
+		result = FBoxHelper.listAlarm(accessToken, FBoxConfig.BOX_UID);
+		//token过期
+		if (result.contains("Authorization has been denied for this request")) {
+			accessToken = FBoxHelper.login();
+			result = FBoxHelper.listAlarm(accessToken, FBoxConfig.BOX_UID);
+			servletContext.setAttribute("accessToken", accessToken);
+		}
+		
+		JSONArray jsonArray = JSONArray.parseArray(result);
+		
+		for (Iterator<Object> iterator = jsonArray.iterator(); iterator.hasNext();) {
+			JSONObject json = (JSONObject) iterator.next();
+			AlarmVO alarmVO = JSONObject.toJavaObject(json, AlarmVO.class);
+			list.add(alarmVO);
+		}
+		
+		return list;
+	}
+
+	@Override
+	public PageVO<AlarmVO> pageHistoryAlarm() {
+		return null;
+	}
+
+	
+}

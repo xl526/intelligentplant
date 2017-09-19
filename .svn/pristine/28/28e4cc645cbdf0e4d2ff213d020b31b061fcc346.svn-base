@@ -1,0 +1,122 @@
+package com.dp.intelligentplant.service.impl;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.servlet.ServletContext;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.WebApplicationContext;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.dp.intelligentplant.dao.IEquipmentDao;
+import com.dp.intelligentplant.dao.IEquipmentbrandDao;
+import com.dp.intelligentplant.dao.IEquipmenttypeDao;
+import com.dp.intelligentplant.domain.Equipment;
+import com.dp.intelligentplant.domain.EquipmentBrand;
+import com.dp.intelligentplant.domain.EquipmentType;
+import com.dp.intelligentplant.fbox.DeviceVO;
+import com.dp.intelligentplant.fbox.FBoxConfig;
+import com.dp.intelligentplant.fbox.FBoxHelper;
+import com.dp.intelligentplant.service.api.EquipmentService;
+
+@Service
+public class EquipmentServiceImpl implements EquipmentService {
+	
+	@Autowired
+	private IEquipmentDao equipmentDao;
+	@Autowired
+	private IEquipmenttypeDao equipmenttype;
+	@Autowired
+	private IEquipmentbrandDao equipmentbrandDao;
+	
+	@Override
+	@Transactional(readOnly = true)
+	public Equipment findEquipmentById(Long equipmentId) {
+		return equipmentDao.findOne(equipmentId);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Iterable<Equipment> listEquipment() {
+		return equipmentDao.findAll();
+	}
+	
+	@Override
+	public void saveOrUpdateEquipment(Equipment equipment) {
+		equipmentDao.save(equipment);
+	}
+
+	@Override
+	public void deleteEquipment(Long equipmentId) {
+		equipmentDao.delete(equipmentId);
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public List<Equipment> listFBoxEquipment() {
+		
+		String accessToken = null;
+		String result = null;
+		List<Equipment> list = new ArrayList<Equipment>();
+		
+		WebApplicationContext webApplicationContext = ContextLoader.getCurrentWebApplicationContext();
+		ServletContext servletContext = webApplicationContext.getServletContext();
+		Object obj = servletContext.getAttribute("accessToken");
+		if (obj == null) {
+			accessToken = FBoxHelper.login();
+			servletContext.setAttribute("accessToken", accessToken);
+		} else {
+			accessToken = (String) obj;
+		}
+		
+		for (String box_uid : FBoxConfig.BOX_UID_ARRAY) {
+			result = FBoxHelper.listDevice(accessToken, box_uid);
+			//token过期
+			if (result.contains("Authorization has been denied for this request")) {
+				accessToken = FBoxHelper.login();
+				result = FBoxHelper.listDevice(accessToken, box_uid);
+				servletContext.setAttribute("accessToken", accessToken);
+			}
+			
+			JSONArray jsonArray = JSONArray.parseArray(result);
+			
+			for (Iterator<Object> iterator = jsonArray.iterator(); iterator.hasNext();) {
+				JSONObject json = (JSONObject) iterator.next();
+				DeviceVO deviceVO = JSONObject.toJavaObject(json, DeviceVO.class);
+				Equipment equipment = fboxDevice2Equipment(deviceVO);
+				list.add(equipment);
+			}
+		}
+		
+		return list;
+	}
+	
+	private Equipment fboxDevice2Equipment(DeviceVO deviceVO) {
+		Equipment equipment = new Equipment();
+		equipment.setEno(deviceVO.getDeviceId());
+		equipment.setEname(deviceVO.getDeviceName());
+		
+		return equipment;
+	}
+
+	@Override
+	@Transactional(readOnly=true)
+	public Iterable<EquipmentType> listEquipmenttype() {
+		// TODO Auto-generated method stub
+		return equipmenttype.findAll();
+	}
+
+	@Override
+	@Transactional(readOnly=true)
+	public Iterable<EquipmentBrand> listEquipmentbrand() {
+		// TODO Auto-generated method stub
+		return equipmentbrandDao.findAll();
+	}
+	
+}

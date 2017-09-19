@@ -1,0 +1,16 @@
+package com.dp.intelligentplant.domain;
+
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+@Entity
+@Table(name="EQUIPMENT_STATUS_PLC")
+public class EquipmentStatusPLC extends EquipmentStatus {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3271408218996914255L;
+
+	
+}

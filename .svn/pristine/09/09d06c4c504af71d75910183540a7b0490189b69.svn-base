@@ -1,0 +1,191 @@
+package com.dp.intelligentplant.util;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.servlet.ServletContext;
+
+import org.springframework.util.StringUtils;
+import org.springframework.web.context.ContextLoader;
+import org.springframework.web.context.WebApplicationContext;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.dp.intelligentplant.domain.DmonDef;
+import com.dp.intelligentplant.domain.DmonValue;
+import com.dp.intelligentplant.domain.Equipment;
+import com.dp.intelligentplant.domain.EquipmentBrand;
+import com.dp.intelligentplant.fbox.DefVO;
+import com.dp.intelligentplant.fbox.DeviceVO;
+import com.dp.intelligentplant.fbox.DmonValueVO;
+import com.dp.intelligentplant.fbox.FBoxConfig;
+import com.dp.intelligentplant.fbox.FBoxHelper;
+import com.dp.intelligentplant.service.api.DmonDefService;
+import com.dp.intelligentplant.service.api.DmonValueService;
+import com.dp.intelligentplant.service.api.EquipmentService;
+
+public class FBoxUtils {
+	
+	/**
+	 * 从fbox同步设备数据
+	 */
+	public static void syncEquipment() {
+		String accessToken = null;
+		String result = null;
+		EquipmentService equipmentService = null;
+		
+		WebApplicationContext webApplicationContext = ContextLoader.getCurrentWebApplicationContext();
+		ServletContext servletContext = webApplicationContext.getServletContext();
+		Object obj = servletContext.getAttribute("accessToken");
+		if (obj == null) {
+			accessToken = FBoxHelper.login();
+			servletContext.setAttribute("accessToken", accessToken);
+		} else {
+			accessToken = (String) obj;
+		}
+		equipmentService = webApplicationContext.getBean(EquipmentService.class);
+		List<Equipment> equipments = new ArrayList<Equipment>();
+		List<String> boxUids = FBoxHelper.getOnlineBox(accessToken);
+//		String[] boxUids = FBoxConfig.BOX_UID_ARRAY;
+		for (String box_uid : boxUids) {
+			result = FBoxHelper.listDevice(accessToken, box_uid);
+			//token过期
+			if (result.contains("Authorization has been denied for this request")) {
+				accessToken = FBoxHelper.login();
+				result = FBoxHelper.listDevice(accessToken, box_uid);
+				servletContext.setAttribute("accessToken", accessToken);
+			}
+			JSONArray jsonArray = JSONArray.parseArray(result);
+			for (Iterator<Object> iterator = jsonArray.iterator(); iterator.hasNext();) {
+				JSONObject json = (JSONObject) iterator.next();
+				DeviceVO deviceVO = JSONObject.toJavaObject(json, DeviceVO.class);
+				
+				if (!deviceVO.getDeviceName().equals("1:Local")) {
+					Equipment equipment = new Equipment();
+					equipment.setEno(box_uid);
+					equipment.setEname(deviceVO.getDeviceName());
+					//默认写入厂商，后面讨论
+					EquipmentBrand brand = equipmentService.findEquipmentBrandById(1L);
+					equipment.setBrand(brand);
+					equipments.add(equipment);
+				}
+			}
+		}
+		equipmentService.syncEquipment(equipments);
+	}
+	
+	/**
+	 * 从fbox同步监控点数据
+	 */
+	public static void syncDmonDef() {
+		String accessToken = null;
+		String result = null;
+		DmonDefService dmonDefService = null;
+		
+		WebApplicationContext webApplicationContext = ContextLoader.getCurrentWebApplicationContext();
+		ServletContext servletContext = webApplicationContext.getServletContext();
+		Object obj = servletContext.getAttribute("accessToken");
+		if (obj == null) {
+			accessToken = FBoxHelper.login();
+			servletContext.setAttribute("accessToken", accessToken);
+		} else {
+			accessToken = (String) obj;
+		}
+		List<DmonDef> dmonDefs = new ArrayList<DmonDef>();
+		for (String box_uid : FBoxConfig.BOX_UID_ARRAY) {
+			result = FBoxHelper.listMonitoringSite(accessToken, box_uid);
+			//token过期
+			if (result.contains("Authorization has been denied for this request")) {
+				accessToken = FBoxHelper.login();
+				result = FBoxHelper.listMonitoringSite(accessToken, box_uid);
+				servletContext.setAttribute("accessToken", accessToken);
+			}
+			JSONArray jsonArray = JSONArray.parseArray(result);
+			for (Iterator<Object> iterator = jsonArray.iterator(); iterator.hasNext();) {
+				JSONObject json = (JSONObject) iterator.next();
+				
+				JSONArray jsonArray1 = json.getJSONArray("dMonEntries");
+				for (Iterator<Object> iterator1 = jsonArray1.iterator(); iterator1.hasNext();) {
+					JSONObject json1 = (JSONObject) iterator1.next();
+					DefVO defVO = JSONObject.toJavaObject(json1, DefVO.class);
+					
+					DmonDef dmonDef = new DmonDef();
+					dmonDef.setUid(defVO.getUid());
+					dmonDef.setName(defVO.getName());
+					dmonDef.setDescription(defVO.getDesc());
+					dmonDef.setDataType(defVO.getDataType());
+					dmonDef.setFracDigits(defVO.getFracDigits());
+					dmonDef.setIntDigits(defVO.getIntDigits());
+					dmonDef.setUnit(defVO.getUnit());
+					dmonDef.setDeviceId(defVO.getSrc().getDeviceId());
+					dmonDef.setMainAddr(defVO.getSrc().getMainAddr());
+					dmonDef.setSubAddr(defVO.getSrc().getSubAddr());
+					dmonDef.setSubIndex(defVO.getSrc().getSubIndex());
+					dmonDef.setBoxUid(defVO.getBoxUid());
+					dmonDefs.add(dmonDef);
+				}
+			}
+		}
+		dmonDefService = webApplicationContext.getBean(DmonDefService.class);
+		dmonDefService.syncDmonDef(dmonDefs);
+	}
+	
+	/**
+	 * 从fbox同步监控点数值数据
+	 */
+	public static void syncDmonValue() {
+		String accessToken = null;
+		String result = null;
+		DmonDefService dmonDefService = null;
+		DmonValueService dmonValueService = null;
+		
+		WebApplicationContext webApplicationContext = ContextLoader.getCurrentWebApplicationContext();
+		ServletContext servletContext = webApplicationContext.getServletContext();
+		Object obj = servletContext.getAttribute("accessToken");
+		if (obj == null) {
+			accessToken = FBoxHelper.login();
+			servletContext.setAttribute("accessToken", accessToken);
+		} else {
+			accessToken = (String) obj;
+		}
+		List<DmonValue> dmonValues = new ArrayList<DmonValue>();
+		dmonDefService = webApplicationContext.getBean(DmonDefService.class);
+		dmonValueService = webApplicationContext.getBean(DmonValueService.class);
+		for (String boxUid : FBoxConfig.BOX_UID_ARRAY) {
+			String boxNo = FBoxConfig.boxMap.get(boxUid);
+			//根据boxUid查找盒子下监控点信息
+			List<DmonDef> dmonDefs = dmonDefService.findDmonDefByBoxUid(boxUid);
+			//将监控点uid放入数组
+			String[] ids = new String[dmonDefs.size()];
+			for (int i = 0; i < ids.length; i++) {
+				ids[i] = dmonDefs.get(i).getUid();
+			}
+			result = FBoxHelper.getBoxDmonValues(accessToken, boxNo, ids);
+			//token过期
+			if (result.contains("Authorization has been denied for this request")) {
+				accessToken = FBoxHelper.login();
+				result = FBoxHelper.getBoxDmonValues(accessToken, boxNo, ids);
+				servletContext.setAttribute("accessToken", accessToken);
+			}
+			if (!StringUtils.isEmpty(result)) {
+				JSONArray jsonArray = JSONArray.parseArray(result);
+				for (Iterator<Object> iterator = jsonArray.iterator(); iterator.hasNext();) {
+					JSONObject json = (JSONObject) iterator.next();
+					DmonValueVO dmonValueVO = JSONObject.toJavaObject(json, DmonValueVO.class);
+					
+					DmonValue dmonValue = new DmonValue();
+					dmonValue.setUid(dmonValueVO.getId());
+					dmonValue.setName(dmonValueVO.getName());
+					dmonValue.setDataType(dmonValueVO.getDataType());
+					dmonValue.setBoxId(dmonValueVO.getBoxId());
+					dmonValue.setValue(dmonValueVO.getValue());
+					dmonValue.setStatus(dmonValueVO.getStatus());
+					dmonValues.add(dmonValue);
+				}
+			}
+		}
+		dmonValueService.syncDmonValue(dmonValues);
+	}
+	
+}

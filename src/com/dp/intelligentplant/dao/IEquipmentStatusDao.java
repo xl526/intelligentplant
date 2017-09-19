@@ -1,0 +1,16 @@
+package com.dp.intelligentplant.dao;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
+
+import com.dp.intelligentplant.domain.EquipmentStatus;
+
+@Repository
+public interface IEquipmentStatusDao extends JpaRepository<EquipmentStatus, Long>, JpaSpecificationExecutor<EquipmentStatus> {
+	
+	public List<EquipmentStatus> findByEquipmentAndParam(Long equipment, String param);
+	
+}

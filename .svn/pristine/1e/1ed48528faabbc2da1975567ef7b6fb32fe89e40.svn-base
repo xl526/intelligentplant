@@ -1,0 +1,79 @@
+package com.dp.intelligentplant.domain;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+@Entity
+@Table(name="EQUIPMENT")
+public class Equipment extends BaseDomain {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7733805311850035229L;
+
+	@Column(name="ENO")
+	private String eno;
+
+	@Column(name="ENAME")
+	private String ename;
+	
+	@Column(name="EDESCRIPTION")
+	private String edescription;
+	
+	@Column(name="status")
+	private String status;
+	@ManyToOne(cascade = {CascadeType.REFRESH}, optional = true)
+    @JoinColumn(name="brand")  
+	private EquipmentBrand brand;
+
+	public String getEno() {
+		return eno;
+	}
+
+	public void setEno(String eno) {
+		this.eno = eno;
+	}
+
+	public String getEname() {
+		return ename;
+	}
+
+	public void setEname(String ename) {
+		this.ename = ename;
+	}
+
+
+	public String getEdescription() {
+		return edescription;
+	}
+
+	public void setEdescription(String edescription) {
+		this.edescription = edescription;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public EquipmentBrand getBrand() {
+		return brand;
+	}
+
+	public void setBrand(EquipmentBrand brand) {
+		this.brand = brand;
+	}
+	
+	
+
+	
+	
+}

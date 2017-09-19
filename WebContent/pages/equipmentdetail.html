@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="import" href="../header.html">
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+  
+    <section class="content-header">
+      <h2>
+                                设备信息
+      </h2>
+    </section>
+    
+    <!-- Main content -->
+    <section class="content">
+      <!-- <div class="row">
+        <div class="col-md-6">
+        </div>
+        
+        <div class="col-md-6">
+        </div>
+      </div> -->
+      
+      <div class="row">
+      	<div class="box box-info">
+      		<div id="grid"></div>
+      	</div>
+      </div>
+      
+    </section>
+  
+<script type="text/javascript">
+$(function () {
+	    //grid列表
+	    var db = {
+  	     		loadData: function(filter){
+  	     			return $.ajax({
+  	     				type: "GET",
+  	     				url: "../dmon/def/page",
+  	     				data: filter
+  	     			});
+  	     		},
+  	     		insertItem: function(item) {},
+  	     		updateItem: function(item) {},
+  	     		deleteItem: function(item) {}
+	    };
+	    
+	    $("#grid").jsGrid({
+            width: "100%",
+            height: "500px",
+     
+            //inserting: true,
+            //editing: true,
+            sorting: true,
+            paging: true,
+            pageLoading: true,
+            
+            autoload: true,
+            //filtering: true,
+     
+            controller: db,
+            //data: clients1,
+     
+            fields: [
+                { name: "uid", title: "", type: "text", width: "150"},
+                { name: "name",title: "", type: "text", width: "150"},
+                { name: "description",title: "", type: "text", width: "150"},
+                { name: "deviceId",title: "", type: "text"},
+                { name: "mainAddr",title: "", type: "text"},
+                { name: "subAddr",title: "", type: "text"},
+                { name: "dataType",title: "", type: "text"},
+                { name: "intDigits",title: "", type: "text"},
+                { name: "fracDigits",title: "", type: "text"}
+            ]
+	    
+        });
+    
+});
+</script>
+
+</body>
+</html>

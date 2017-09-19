@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="import" href="../header.html">
+  <script>
+  $(function () {
+	  $("#nav").load("../nav.html");
+  })
+  </script>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+<div class="wrapper">
+
+  <div id="nav"></div>
+  
+  <div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        	生产统计
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">生产统计</li>
+      </ol>
+    </section>
+    
+    <!-- Main content -->
+    <section class="content">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="box box-primary">
+            <div class="box-header with-border">
+              <i class="fa fa-bar-chart-o"></i>
+              <h3 class="box-title">产品分布</h3>
+              
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>
+            <div class="box-body">
+              <div id="chart1" style="height:300px"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="box box-info">
+            <div class="box-header with-border">
+              <i class="fa fa-bar-chart-o"></i>
+              <h3 class="box-title">产品累积</h3>
+
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>
+            <div class="box-body">
+                <div id="chart2" style="height:300px"></div>
+            </div>
+          </div>
+        </div>
+      </div>   
+    </section>
+    
+  </div>
+  
+</div>
+
+<!-- FLOT CHARTS -->
+<script src="../jsframework/AdminLTE-2.3.11/plugins/flot/jquery.flot.min.js"></script>
+<!-- FLOT RESIZE PLUGIN - allows the chart to redraw when the window is resized -->
+<script src="../jsframework/AdminLTE-2.3.11/plugins/flot/jquery.flot.resize.min.js"></script>
+<!-- FLOT PIE PLUGIN - also used to draw donut charts -->
+<script src="../jsframework/AdminLTE-2.3.11/plugins/flot/jquery.flot.pie.min.js"></script>
+<!-- FLOT CATEGORIES PLUGIN - Used to draw bar charts -->
+<script src="../jsframework/AdminLTE-2.3.11/plugins/flot/jquery.flot.categories.min.js"></script>
+<script type="text/javascript">
+$(function () {
+		var bar_data1 = {
+	      data: [["1月", 10], ["2月", 8], ["3月", 4], ["4月", 13], ["5月", 17], ["6月", 9]],
+	      color: "#3c8dbc"
+	    };
+		var bar_data2 = {
+	      data: [["1月", 8], ["2月", 10], ["3月", 12], ["4月", 14], ["5月", 16], ["6月", 18]],
+	      color: "#3c8dbc"
+		};
+		
+	    $.plot("#chart1", [bar_data1], {
+	      grid: {
+	        borderWidth: 1,
+	        borderColor: "#f3f3f3",
+	        tickColor: "#f3f3f3"
+	      },
+	      series: {
+	        bars: {
+	          show: true,
+	          barWidth: 0.5,
+	          align: "center"
+	        }
+	      },
+	      xaxis: {
+	        mode: "categories",
+	        tickLength: 0
+	      }
+	    });
+	    
+	    $.plot("#chart2", [bar_data2], {
+	      grid: {
+	        borderWidth: 1,
+	        borderColor: "#f3f3f3",
+	        tickColor: "#f3f3f3"
+	      },
+	      series: {
+	        bars: {
+	          show: true,
+	          barWidth: 0.5,
+	          align: "center"
+	        }
+	      },
+	      xaxis: {
+	        mode: "categories",
+	        tickLength: 0
+	      }
+	    });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+package com.dp.intelligentplant.test;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.annotation.Resource;
+import javax.jms.JMSException;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import com.dp.intelligentplant.domain.Device;
+import com.dp.intelligentplant.mq.AQHandler;
+import com.dp.intelligentplant.service.api.DeviceService;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = "classpath:applicationContext.xml")
+public class AQTest extends AbstractJUnit4SpringContextTests {
+
+	@Resource
+	private DeviceService deviceService;
+	
+	@Test
+	public void receiveTest() {
+		List<String> list = new ArrayList<String>();
+		try {
+			list = AQHandler.receive(10);
+		} catch (JMSException e) {
+			e.printStackTrace();
+		}
+		if (list.size() > 0) {
+			for (String str : list) {
+				Device device = new Device();
+				device.setTag(str);
+				device.setCreateTime(new Date());
+				device.setUpdateTime(new Date());
+				deviceService.saveDevice(device);
+			}
+		}
+	}
+	
+	@Test
+	public void receiveByListenerTest() {
+		try {
+			AQHandler.receiveByListener();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+}

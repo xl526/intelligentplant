@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>AdminLTE 2 | Dashboard</title>
+  <link rel="import" href="../header.html">
+  <script>
+  $(function () {
+	  $("#nav").load("../nav.html");
+  })
+  </script>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+<div class="wrapper">
+
+
+  <div id="nav"></div>
+
+  
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+       设备管理
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">刀具管理</li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <div class="box">
+      
+          <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs">
+              <li class="active"><a href="#activity" data-toggle="tab">刀具使用寿命情况</a></li>
+              <li><a href="#timeline" data-toggle="tab">刀具寿命设定</a></li>
+            </ul>
+            <div class="tab-content">
+              <div class="active tab-pane" id="activity">
+                <div class="box-body">
+                   <div id="jsGrid"></div>
+                </div>
+              </div>
+              
+              <div class="tab-pane" id="timeline">
+               <div class="box-body">
+	               <div id="config"></div>
+               </div>
+              </div>
+            </div>
+            <!-- /.tab-content -->
+          </div>
+          <!-- /.nav-tabs-custom -->
+      </div>   
+    </section>
+    <!-- /.content -->
+  </div>
+  
+</div>
+
+<script>
+  $(function () {
+	  /* var clients = [
+	                 { "No": "1", "EQUIPMENT": 1, "COUNTMETHOD": 1, "UNIT": 1, "MAX": 2000,"WARNING":1800 },
+	                 { "No": "2", "EQUIPMENT": 3, "COUNTMETHOD": 2, "UNIT": 2, "MAX": 2000,"WARNING":1800 },
+	                 { "No": "3", "EQUIPMENT": 1, "COUNTMETHOD": 2, "UNIT": 2, "MAX": 2000,"WARNING":1800 },
+	                 { "No": "4", "EQUIPMENT": 2, "COUNTMETHOD": 1, "UNIT": 1, "MAX": 2000,"WARNING":1800 },
+	                 { "No": "5", "EQUIPMENT": 1, "COUNTMETHOD": 2, "UNIT": 2, "MAX": 2000,"WARNING":1800 }
+	             ]; */
+	          
+	  		var db1 = {
+ 	     		loadData: function(filter){
+ 	     			return $.ajax({
+ 	     				type: "GET",
+ 	     				url: "../knife/page",
+ 	     				data: filter
+ 	     			});
+ 	     		},
+ 	     		insertItem: function(item) {
+ 	     			return $.ajax({
+ 	     	            type: "POST",
+ 	     	            url: "../knife/saveOrUpdate",
+ 	     	            data: item
+ 	     	        });
+ 	     		},
+ 	     		updateItem: function(item) {
+ 	     			return $.ajax({
+ 	     	            type: "POST",
+ 	     	            url: "../knife/saveOrUpdate",
+ 	     	            data: item
+ 	     	        });
+ 	     		},
+ 	     		deleteItem: function(item) {
+ 	     			return $.ajax({
+ 	     	            type: "POST",
+ 	     	            url: "../knife/delete",
+ 	     	            data: item
+ 	     	        });
+ 	     		}
+ 	     	};
+	  
+	             $("#config").jsGrid({
+	                 width: "100%",
+	                 height: "400px",
+	          
+	                 inserting: true,
+	                 editing: true,
+	                 sorting: true,
+	                 paging: true,
+	                 pageLoading: true,
+	                 
+	                 autoload: true,
+	                 filtering: true,
+	          
+	                 /* data: clients, */
+	                 controller: db1,
+	                 onItemUpdated: function(args) {
+	                	 $("#config").jsGrid("loadData");
+	                 },
+	          
+	                 fields: [
+	                     { name: "no", type: "text", width: 50,title:'刀具号'},
+	                     { name: "device",title: "设备", type: "select",items: [
+	  	                                                                       { Name: "OP10", Id: "1" },
+	  	                                                                       { Name: "OP11", Id: "2" },
+	  	                                                                       { Name: "OP12", Id: "3" },
+	  	                                                                       { Name: "OP13", Id: "4" },
+	  	                                                                       { Name: "OP14", Id: "5" },
+	  	                                                                       { Name: "OP16", Id: "6" },
+		                                                                  ],
+		                                                                  valueField: "Id",
+		                                                                  textField: "Name",width: 100 },
+	                     { name: "manageType",title: "管理方式", type: "select", items: [
+	                                                                       { Name: "切削时间", Id: "1" },
+	                                                                       { Name: "切削次数", Id: "2" }
+	                                                                  ],
+	                                                                  valueField: "Id",
+	                                                                  textField: "Name",width: 100 },
+	                     { name: "unit",title: "计量单位", type: "select", items: [
+		                                                                       { Name: "分钟", Id: "1" },
+		                                                                       { Name: "次数", Id: "2" }
+		                                                                  ],
+		                                                                  valueField: "Id",
+		                                                                  textField: "Name",width: 100  },
+	                     { name: "maxTime",title: "最大寿命", type: "text", sorting: false },
+	                     { name: "warningTime",title: "预警寿命", type: "text", sorting: false },
+	                     { type: "control" }
+	                 ]
+	             });
+	             
+	       	             
+	       	     	 var db2 = {
+	       	     		loadData: function(filter){
+	       	     			return $.ajax({
+	       	     				type: "GET",
+	       	     				url: "../knife/page",
+	       	     				data: filter
+	       	     			});
+	       	     		},
+	       	     		insertItem: function(item) {
+	       	     			
+	       	     		},
+	       	     		updateItem: function(item) {
+	       	     			
+	       	     		},
+	       	     		deleteItem: function(item) {
+	       	     			
+	       	     		}
+	       	     	 };
+	             
+    	             $("#jsGrid").jsGrid({
+    	                 width: "100%",
+    	                 height: "400px",
+    	          
+    	                 //inserting: true,
+    	                 //editing: true,
+    	                 sorting: true,
+    	                 paging: true,
+    	                 pageLoading: true,
+    	                 
+    	                 autoload: true,
+    	                 //filtering: true,
+    	          
+    	                 controller: db2,
+    	                 //data: clients1,
+    	          
+    	                 fields: [
+    	                     { name: "no", title:'刀具号', type: "text", width: 50},
+    	                     
+    	                     { name: "device",title: "设备", type: "text", sorting: false },
+    	                     { name: "manageType",title: "管理方式", type: "text", sorting: false },
+    	                     { name: "unit",title: "计量单位", type: "text", sorting: false },
+    	                     { name: "maxTime",title: "最大寿命", type: "text", sorting: false },
+    	                     { name: "warningTime",title: "预警寿命", type: "text", sorting: false },
+    	                 ]
+    	             });
+  });
+</script>
+</body>
+</html>

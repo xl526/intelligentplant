@@ -1,0 +1,12 @@
+package com.dp.intelligentplant.test;
+
+import java.text.ParseException;
+
+import com.dp.intelligentplant.websocket.SignalRWebSocket;
+
+public class ArrayTest {
+	
+	public static void main(String[] args) throws ParseException {
+	}
+	
+}

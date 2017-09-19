@@ -1,0 +1,27 @@
+package com.dp.intelligentplant.service.impl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.dp.intelligentplant.dao.IEquipmentDao;
+import com.dp.intelligentplant.domain.Equipment;
+import com.dp.intelligentplant.service.api.EquipmentService;
+import com.dp.intelligentplant.service.api.EquipmentStatusService;
+
+@Service
+public class EquipmentServiceImpl implements EquipmentService {
+	
+	@Autowired
+	private IEquipmentDao equipmentDao;
+	
+	@Autowired
+	private EquipmentStatusService equipmentStatusService;
+	
+	@Override
+	@Transactional(readOnly = true)
+	public Equipment findEquipmentById(Long equipmentId) {
+		return equipmentDao.findOne(equipmentId);
+	}
+	
+}

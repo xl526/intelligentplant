@@ -1,0 +1,69 @@
+package com.dp.intelligentplant.mq;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.jms.Connection;
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageProducer;
+import javax.jms.Session;
+import javax.jms.TextMessage;
+
+import org.apache.activemq.ActiveMQConnectionFactory;
+
+public class AQHandler {
+	
+	private static Connection conn;
+	
+	private static Session ses;
+	
+	static {
+		init();
+	}
+	
+	private static void init() {
+		ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory("failover:(tcp://101.37.78.172:61616)");
+		try {
+			conn = factory.createConnection();
+			ses = conn.createSession(false, Session.AUTO_ACKNOWLEDGE);
+		} catch (JMSException e) {
+			e.printStackTrace();
+			throw new RuntimeException("an exception happened..");
+		}
+		
+	}
+	
+	public static void send(String message) throws JMSException {
+		MessageProducer messageProducer = ses.createProducer(ses.createQueue("IN.Q"));
+		conn.start();
+		messageProducer.send(ses.createTextMessage(message));
+	}
+	
+	public static List<String> receive(long num) throws JMSException {
+		List<String> list = new ArrayList<String>();
+		Destination destination = ses.createQueue("IN.Q");
+		MessageConsumer messageConsumer = ses.createConsumer(destination);
+		conn.start();
+		
+		if (num > 0) {
+			for (int i = 0; i < num; i++) {
+				TextMessage textMessage = (TextMessage) messageConsumer.receive(100000);
+				if (textMessage != null) {
+					list.add(textMessage.getText());
+				}
+			}
+		}
+		return list;
+	}
+	
+	public static void receiveByListener() throws Exception {
+		Destination destination = ses.createQueue("IN.Q");
+		MessageConsumer messageConsumer = ses.createConsumer(destination);
+		messageConsumer.setMessageListener(new ConsumerMessageListener());
+		conn.start();
+//		Thread.sleep(1000 * 100);
+	}
+	
+}

@@ -1,0 +1,22 @@
+package com.dp.intelligentplant.service.api;
+
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import com.dp.intelligentplant.domain.DmonValue;
+
+public interface DmonValueService {
+	
+	public void saveDmonValue(DmonValue dmonValue);
+	
+	public void deleteDmonValue(Long id);
+	
+	public Page<DmonValue> findDmonValueByPage(Pageable pageable);
+	
+	public List<DmonValue> listDmonValue();
+	
+	public void syncDmonValue(List<DmonValue> dmonValues);
+	
+}

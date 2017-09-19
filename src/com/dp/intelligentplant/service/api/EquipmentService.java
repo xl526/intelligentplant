@@ -1,0 +1,49 @@
+package com.dp.intelligentplant.service.api;
+
+import java.util.List;
+
+import com.dp.intelligentplant.domain.Equipment;
+import com.dp.intelligentplant.domain.EquipmentBrand;
+import com.dp.intelligentplant.domain.EquipmentRegion;
+import com.dp.intelligentplant.domain.EquipmentType;
+import com.dp.intelligentplant.vo.EquipmentVO;
+
+public interface EquipmentService {
+	
+	public Equipment findEquipmentById(Long equipmentId);
+	
+	public EquipmentBrand findEquipmentBrandById(Long equipmentBrandId);
+	
+	public EquipmentType findEquipmentTypeById(Long equipmentTypeId);
+	
+	public EquipmentRegion findEquipmentRegionById(Long equipmentRegionId);
+	
+	public Iterable<Equipment> listEquipment(EquipmentVO equipmentVO);
+	
+	public void saveOrUpdateEquipment(Equipment equipment);
+	
+	public void saveOrUpdateEquipmentType(EquipmentType equipmentType);
+	
+	public void saveOrUpdateEquipmentBrand(EquipmentBrand equipmentBrand);
+	
+	public void saveOrUpdateEquipmentRegion(EquipmentRegion equipmentRegion);
+	
+	public void deleteEquipment(Long equipmentId);
+	
+	public void deleteEquipmentType(Long equipmentTypeId);
+	
+	public void deleteEquipmentBrand(Long equipmentBrandId);
+	
+	public void deleteEquipmentRegion(Long equipmentRegionId);
+	
+	public List<Equipment> listFBoxEquipment();
+	
+	public Iterable<EquipmentType> listEquipmenttype();
+	
+	public Iterable<EquipmentBrand> listEquipmentbrand();
+	
+	public Iterable<EquipmentRegion> listEquipmentregion();
+	
+	public void syncEquipment(List<Equipment> equipments);
+	
+}

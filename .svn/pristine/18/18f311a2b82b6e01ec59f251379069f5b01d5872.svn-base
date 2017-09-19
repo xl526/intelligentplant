@@ -1,0 +1,65 @@
+package com.dp.intelligentplant.domain;
+
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+@Entity
+@Table(name="EQUIPMENT_STATUS")
+public class EquipmentStatus extends BaseDomain {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7146211668650225730L;
+
+	@Column(name="EQUIPMENT")
+	private Long equipment;
+
+	@Column(name="PARAM")
+	private String param;
+	
+	@Column(name="VALUE")
+	private String value;
+	
+	@Column(name="RECORD_TIME")
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	private Date recordTime;
+
+	public Long getEquipment() {
+		return equipment;
+	}
+
+	public void setEquipment(Long equipment) {
+		this.equipment = equipment;
+	}
+
+	public String getParam() {
+		return param;
+	}
+
+	public void setParam(String param) {
+		this.param = param;
+	}
+
+	public String getValue() {
+		return value;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
+	}
+
+	public Date getRecordTime() {
+		return recordTime;
+	}
+
+	public void setRecordTime(Date recordTime) {
+		this.recordTime = recordTime;
+	}
+	
+}

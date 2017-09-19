@@ -1,0 +1,17 @@
+package com.dp.intelligentplant.service.api;
+
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+
+import com.dp.intelligentplant.domain.EquipmentStatus;
+import com.dp.intelligentplant.util.PageVO;
+import com.dp.intelligentplant.vo.EquipmentStatusVO;
+
+public interface EquipmentStatusService {
+	
+	public List<EquipmentStatus> findByEquipmentId(Long equipmentId, String param);
+	
+	public Page<EquipmentStatus> findByPageAndParams(PageVO<EquipmentStatus> pageVO, final EquipmentStatusVO equipmentStatusVO);
+	
+}

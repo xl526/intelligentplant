@@ -1,0 +1,24 @@
+package com.dp.intelligentplant.service.api;
+
+import java.util.List;
+
+import com.dp.intelligentplant.domain.Equipment;
+import com.dp.intelligentplant.domain.EquipmentBrand;
+import com.dp.intelligentplant.domain.EquipmentType;
+
+public interface EquipmentService {
+	
+	public Equipment findEquipmentById(Long equipmentId);
+	
+	public Iterable<Equipment> listEquipment();
+	
+	public void saveOrUpdateEquipment(Equipment equipment);
+	
+	public void deleteEquipment(Long equipmentId);
+	
+	public List<Equipment> listFBoxEquipment();
+	
+	public Iterable<EquipmentType> listEquipmenttype();
+	
+	public Iterable<EquipmentBrand> listEquipmentbrand();
+}

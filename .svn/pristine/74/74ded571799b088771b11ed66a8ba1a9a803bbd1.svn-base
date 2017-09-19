@@ -1,0 +1,11 @@
+#dataSource
+driverClass=com.mysql.jdbc.Driver
+url=jdbc:mysql://localhost:4306/intelligentplant?useUnicode=true&characterEncoding=UTF-8
+user=root
+password=123456
+
+#jpaProperties
+hibernate.dialect=org.hibernate.dialect.MySQLDialect
+hibernate.show_sql=true
+hibernate.format_sql=true
+hibernate.hbm2ddl.auto=update

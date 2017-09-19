@@ -1,0 +1,64 @@
+	<header class="main-header">
+    <!-- Logo -->
+    <a href="#" class="logo">
+      <!-- mini logo for sidebar mini 50x50 pixels -->
+      <span class="logo-mini">东浦数据采集云平台</span>
+      <!-- logo for regular state and mobile devices -->
+      <span class="logo-lg">东浦数据采集云平台</span>
+    </a>
+    <!-- Header Navbar: style can be found in header.less -->
+    <nav class="navbar navbar-static-top">
+      <!-- Sidebar toggle button-->
+      <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+        <span class="sr-only">Toggle navigation</span>
+      </a>
+
+      
+    </nav>
+  </header>
+  <!-- Left side column. contains the logo and sidebar -->
+  <aside class="main-sidebar">
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar">
+      
+     
+      <!-- /.search form -->
+      <!-- sidebar menu: : style can be found in sidebar.less -->
+      <ul class="sidebar-menu">
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-dashboard"></i><span>demo演示</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+              <li><a href="/intelligentplant/pages/devicemonitor.html"><i class="fa fa-circle-o"></i>设备运行状态监控</a></li>
+              <li><a href="/intelligentplant/pages/knifemanagement.html"><i class="fa fa-circle-o"></i>刀具管理</a></li>
+              <li><a href="/intelligentplant/pages/devicemanager.html"><i class="fa fa-circle-o"></i>能耗管理</a></li>
+              <!-- <li><a href="javascript:void(0)"><i class="fa fa-circle-o"></i>设备保全</a></li>
+              <li><a href="javascript:void(0)"><i class="fa fa-circle-o"></i>设备操作记录</a></li> -->
+              <li><a href="/intelligentplant/pages/equipmentoee.html"><i class="fa fa-circle-o"></i>设备OEE</a></li>
+              <li><a href="/intelligentplant/pages/statistics.html"><i class="fa fa-circle-o"></i>数据图表</a></li>
+              <li><a href="/intelligentplant/pages/inoutstock.html"><i class="fa fa-circle-o"></i>数据录入</a></li>
+          </ul>
+        </li>
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-dashboard"></i><span>数据采集</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+          	<li><a href="/intelligentplant/pages/equiptypemanagement.html"><i class="fa fa-circle-o"></i>设备类型管理</a></li>
+            <li><a href="/intelligentplant/pages/equipbrandmanagement.html"><i class="fa fa-circle-o"></i>设备厂商管理</a></li>
+            <li><a href="/intelligentplant/pages/equipview.html"><i class="fa fa-circle-o"></i>设备管理</a></li>
+          </ul>
+        </li>
+        
+      </ul>
+    </section>
+    <!-- /.sidebar -->
+  </aside>
+  

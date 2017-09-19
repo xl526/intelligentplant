@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>AdminLTE 2 | Dashboard</title>
+  <link rel="import" href="../header.html">
+  <script>
+  $(function () {
+	  $("#nav").load("../nav.html");
+  })
+  </script>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+<div class="wrapper">
+
+  <div id="nav"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+       	盒子数据
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">盒子数据</li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-5">
+              <div class="form-group">
+                <div class="input-group">
+                  <div class="input-group-addon">
+                    <i class="fa fa-clock-o"></i>
+                  </div>
+                  <input type="text" class="form-control pull-right" id="rangeTime" name="rangeTime">
+                   <span class="input-group-btn">
+                   <button type="button" class="btn btn-info btn-flat" onclick="rangeTimeFun()">查询</button>
+                  </span>
+                </div>
+              </div>
+            </div>
+        </div>
+    
+        <div class="box" style="height:500px">
+            <div id="jsGrid"></div>
+        </div>
+    </section>
+    
+  </div>
+  
+</div>
+
+<script>
+  $(function () {
+	  $('#rangeTime').daterangepicker({
+		  timePicker: true, 
+		  timePickerIncrement: 30,
+		  timePicker24Hour: true,
+		  locale: {
+			    format: 'YYYY-MM-DD hh:mm'
+	      }
+	  });
+	  
+	  		var db = {
+ 	     		loadData: function(filter){
+ 	     			
+ 	     			filter.rangeTime = $("#rangeTime").val();
+ 	     			
+ 	     			return $.ajax({
+ 	     				type: "GET",
+ 	     				url: "../fbox/page",
+ 	     				data: filter
+ 	     			});
+ 	     		},
+ 	     		insertItem: function(item) {
+ 	     			
+ 	     		},
+ 	     		updateItem: function(item) {
+ 	     			
+ 	     		},
+ 	     		deleteItem: function(item) {
+ 	     			
+ 	     		}
+ 	     	};
+	  
+	             $("#jsGrid").jsGrid({
+	                 width: "100%",
+	                 height: "400px",
+	          
+	                 //inserting: true,
+	                 editing: false,
+	                 sorting: true,
+	                 paging: true,
+	                 pageLoading: true,
+	                 
+	                 autoload: true,
+	                 //filtering: true,
+	          
+	                 controller: db,
+	          
+	                 fields: [
+	                     { name: "param", title: "名称", type: "text", width: 100},
+	                     { name: "value",title: "数值", type: "text", width: 100},
+	                     { name: "recordTime",title: "记录时间", type: "text"}
+	                 ]
+	                 
+	             });
+	             
+  });
+</script>
+
+<script type="text/javascript">
+function rangeTimeFun() {
+	var rt = $("#rangeTime").val();
+	$("#jsGrid").jsGrid("loadData", {rangeTime: rt});
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>设备管理</title>
+  
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <!-- Bootstrap 3.3.6 -->
+  <link rel="stylesheet" href="../jsframework/AdminLTE-2.3.11/bootstrap/css/bootstrap.min.css">
+   <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
+  <!-- Ionicons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+  
+  <!-- datatables css-->
+  <link rel="stylesheet" href="../jsframework/datatables/dataTables/css/dataTables.bootstrap.min.css" >
+  <link rel="stylesheet" href="../jsframework/datatables/select/css/select.bootstrap.min.css" >
+  <link rel="stylesheet" href="../jsframework/datatables/buttons/css/buttons.bootstrap.min.css" >
+  
+  <!-- Theme style -->
+  <link rel="stylesheet" href="../jsframework/AdminLTE-2.3.11/dist/css/AdminLTE.min.css">
+  <!-- AdminLTE Skins. Choose a skin from the css/skins
+       folder instead of downloading all of them to reduce the load. -->
+  <link rel="stylesheet" href="../jsframework/AdminLTE-2.3.11/dist/css/skins/skin-blue.min.css">
+  
+  <link rel="stylesheet" href="../jsframework/jsgrid/jsgrid.min.css">
+  <link rel="stylesheet" href="../jsframework/jsgrid/jsgrid-theme.css">
+  
+  <!-- jQuery 2.2.3 -->
+  <script src="../jsframework/AdminLTE-2.3.11/plugins/jQuery/jquery-2.2.3.min.js"></script>
+  <!-- Bootstrap 3.3.6 -->
+  <script src="../jsframework/AdminLTE-2.3.11/bootstrap/js/bootstrap.min.js"></script>
+  
+  <!-- datatables js-->
+  <script src="../jsframework/datatables/dataTables/js/jquery.dataTables.min.js"></script>
+  <script src="../jsframework/datatables/dataTables/js/dataTables.bootstrap.min.js"></script>
+  <script src="../jsframework/datatables/select/js/dataTables.select.min.js"></script>
+  <script src="../jsframework/datatables/buttons/js/dataTables.buttons.min.js"></script>
+  <script src="../jsframework/datatables/buttons/js/buttons.bootstrap.min.js"></script>
+  
+  <!-- layer -->
+  <script src="../jsframework/layer/layer.js"></script>
+  
+  <!-- jsgrid -->
+  <script src="../jsframework/jsgrid/jsgrid.min.js"></script>
+  
+  <!-- Slimscroll -->
+  <script src="../jsframework/AdminLTE-2.3.11/plugins/slimScroll/jquery.slimscroll.min.js"></script>
+  <!-- FastClick -->
+  <script src="../jsframework/AdminLTE-2.3.11/plugins/fastclick/fastclick.js"></script>
+  <!-- AdminLTE App -->
+  <script src="../jsframework/AdminLTE-2.3.11/dist/js/app.min.js"></script>
+  <!-- AdminLTE for demo purposes -->
+  <script src="../jsframework/AdminLTE-2.3.11/dist/js/demo.js"></script>
+    
+  <script>
+  $(function () {
+	  $("#nav").load("../nav.html");
+  });
+  </script>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+
+<!-- 表单 -->
+<div class="box box-info" style="display: none" id="form_div">
+	<form class="form-horizontal" action="../equipment/saveOrUpdate" method="post">
+		<div class="box-body">
+		    <input class="form-control hidden" name="id" />
+			
+			<div class="form-group">
+				<label class="col-sm-2 control-label">名称</label>
+				<div class="col-sm-9">
+					<input class="form-control" name="ename" />
+				</div>
+			</div>
+			<div class="form-group">
+                <label class="col-sm-2 control-label">描述</label>
+                <div class="col-sm-9">
+                    <input class="form-control" name="edescription" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">设备厂商</label>
+                <div class="col-sm-9">
+                <select class="form-control select2" id="equipmentbrand" name="equipmentbrand">
+                </select>
+                </div>
+            </div>
+		</div>
+		<div class="box-footer">
+			<button type="submit" class="btn btn-info pull-right">保存</button>
+		</div>
+	</form>
+</div>
+
+<div class="box box-info" style="display: none" id="detail_div">
+    <div class="row">
+	    <form class="form-horizontal">
+	        <div class="col-md-6">
+	            <div class="form-group">
+		            <label class="col-sm-2 control-label">编号</label>
+		            <div class="col-sm-10">
+			            <p id="detail_eno" class="form-control-static"></p>
+		            </div>
+	            </div>
+	            <div class="form-group">
+	                <label class="col-sm-2 control-label">厂商</label>
+	                <div class="col-sm-10">
+	                    <p id="detail_brand" class="form-control-static"></p>
+	                </div>
+	            </div>
+	            <div class="form-group">
+	                <label class="col-sm-2 control-label">状态</label>
+	                <div class="col-sm-10">
+	                    <p id="detail_status" class="form-control-static"></p>
+	                </div>
+	            </div>
+	        </div>
+	        <div class="col-md-6">
+	            <div class="form-group">
+		            <label class="col-sm-2 control-label">名称</label>
+		            <div class="col-sm-10">
+		                <p id="detail_ename" class="form-control-static"></p>
+		            </div>
+	            </div>
+	            <div class="form-group">
+	                <label class="col-sm-2 control-label">类型</label>
+	                <div class="col-sm-10">
+	                    <p id="detail_type" class="form-control-static"></p>
+	                </div>
+	            </div>
+	            <div class="form-group">
+	                <label class="col-sm-2 control-label">描述</label>
+	                <div class="col-sm-10">
+	                    <p id="detail_edescription" class="form-control-static"></p>
+	                </div>
+	            </div>
+	        </div>
+	    </form>
+	</div>
+    <div class="row">
+	    <div id="grid" class="col-sm-12"></div>
+    </div>
+</div>
+
+<div class="wrapper">
+  
+  <div id="nav"></div>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+       	设备管理
+      </h1>
+      <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+        <li class="active">设备管理</li>
+      </ol>
+    </section>
+
+    <section class="content">
+      <div class="box box-default">
+       
+        <div class="box-body">
+          <div class="row">
+                <div class="col-xs-3">
+                  <select class="form-control select2" id="equipmenttype_select">
+                  </select>
+                </div>
+                <div class="col-xs-3">
+                  <select class="form-control select2" id="equipmentbrand_select">
+                  </select>
+                </div>
+                <div class="col-xs-3">
+                  <input type="text"/>
+                </div>
+                <div class="col-xs-1">
+                  <input type="button" value="查询"/>
+                </div>
+          </div>
+        </div>
+      </div>
+        
+        <table id="datatable" class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>设备类型</th>
+                    <th>生产厂商</th>
+                    <th>设备编号</th>
+                    <th>设备名称</th>
+                    <th>设备描述</th>
+                    <th>状态</th>
+                </tr>
+            </thead>
+        </table>
+    </section>
+  </div>
+</div>
+
+<script>
+var dataTable;
+
+$(document).ready(function() {
+	
+	  var $select = $('#equipmentbrand');
+
+      $.getJSON('/intelligentplant/equipment/brand/list', function(data){
+
+      $select.html('');
+
+      $.each(data.data, function(key, val){
+        $select.append('<option value="' + val.id + '">' + val.name +'</option>');
+      })
+    });
+	
+    dataTable = $('#datatable').DataTable({
+    	ajax : "/intelligentplant/equipment/list",
+    	/* ordering : true,
+        
+        paging : true, */
+        select: true,
+        searching : false,
+        "paging": false,
+        lengthChange: false,
+        columns : [{
+        	data: "id",
+        	label:'id',
+        	visible: false
+        },  {
+            data: "brand.type.name",
+            label:'设备类型'
+        }, {
+            data: "brand.name",
+            label:'生产厂商'
+        },{
+            data: "eno",
+            label:'设备编号'
+        }, {
+            data: "ename",
+            label:'设备名称'
+        }, {
+            data: "edescription",
+            label:'设备描述'
+        }, {
+            data: "status",
+            render: function ( data, type, row ) {
+            	if(data=='运行中'){
+            		return '<span class="badge bg-light-blue">运行中</span>';
+            	}else{
+            		return '<span class="badge bg-red">'+data+'</span>';
+            	}
+                
+            },
+            label:'状态'
+        }],
+        //dom: 'Bfrtip',
+        buttons : [ {
+            text : '新增',
+            action : function(e, dt, node, config) {
+            	
+            	layer.open({
+                    type: 1,
+                    content: $('#form_div'),
+                    title: '编辑',
+                    area: ['550px', '380px']
+                });
+            }
+        }, {
+            text : '更新',
+            action : function(e, dt, node, config) {
+            	var len = dataTable.rows( { selected: true } ).data().length;
+                if (len == 0) {
+                    layer.alert('请选择一行数据');
+                    return false;
+                }
+            	var row = dataTable.rows( { selected: true } ).data()[0];
+            	var id = row.id;
+            	var ename = row.name;
+                var equipmentbrand = row.brand.id;
+            	var edescription = row.description;
+            	
+            	$("#form_div [name='id']").val(id);
+            	$("#form_div [name='ename']").val(ename);
+            	$("#form_div [name='equipmentbrand']").val(equipmentbrand);
+            	$("#form_div [name='edescription']").val(edescription);
+            	layer.open({
+                    type: 1,
+                    content: $('#form_div'),
+                    title: '编辑',
+                    area: ['550px', '380px']
+                });
+            }
+        }, {
+            text : '删除',
+            action : function(e, dt, node, config) {
+            	var len = dataTable.rows( { selected: true } ).data().length;
+                if (len == 0) {
+                    layer.alert('请选择一行数据');
+                    return false;
+                }
+                var id = dataTable.rows( { selected: true } ).data()[0].id;
+                $.ajax({url: "/intelligentplant/equipment/delete/"+id, success: function(result) {
+                	layer.alert('操作成功', function(){
+                		   location.reload();
+                	});
+                }});
+            }
+        }],
+        initComplete : function() {
+            dataTable.buttons().container().appendTo($('.col-sm-6:eq(0)'));
+        }
+    });
+
+    $('#datatable tbody').on('dblclick', 'tr', function() {
+    	var row = dataTable.row(this).data();
+    	$("#detail_eno").text(row.eno);
+    	$("#detail_ename").text(row.ename);
+    	$("#detail_brand").text(row.brand.name);
+    	$("#detail_type").text(row.brand.type.name);
+    	$("#detail_status").text(row.status);
+    	$("#detail_edescription").text(row.edescription);
+    	
+    	//grid列表
+        var db = {
+                loadData: function(filter){
+                	filter.boxUid = row.eno;        	
+                    return $.ajax({
+                        type: "GET",
+                        url: "../dmon/def/page",
+                        data: filter
+                    });
+                },
+                insertItem: function(item) {},
+                updateItem: function(item) {},
+                deleteItem: function(item) {}
+        };
+        $("#grid").jsGrid({
+            width: "100%",
+            height: "420px",
+            //inserting: true,
+            //editing: true,
+            sorting: true,
+            paging: true,
+            pageLoading: true,
+            autoload: true,
+            pageSize: 10,
+            //filtering: true,
+            controller: db,
+            //data: clients1,
+            fields: [
+                { name: "uid", title: "监控点uid", type: "text", width: 150},
+                { name: "name",title: "名称", type: "text"},
+                { name: "description",title: "描述", type: "text", width: 150},
+                { name: "deviceId",title: "设备uid", type: "text"},
+                { name: "mainAddr",title: "主地址", type: "text"},
+                { name: "subAddr",title: "子地址", type: "text"},
+                { name: "dataType",title: "数据类型", type: "text"},
+                { name: "intDigits",title: "整数位", type: "text"},
+                { name: "fracDigits",title: "小数位", type: "text"}
+            ]
+        });
+    	
+    	layer.open({
+            type: 1,
+            content: $('#detail_div'),
+            title: '设备信息',
+            area: ['1000px', '650px']
+        });
+    });
+    
+});
+</script>
+
+</body>
+</html>

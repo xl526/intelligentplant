@@ -1,0 +1,49 @@
+package com.dp.intelligentplant.service.impl;
+
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.dp.intelligentplant.dao.IDmonValueDao;
+import com.dp.intelligentplant.domain.DmonDef;
+import com.dp.intelligentplant.domain.DmonValue;
+import com.dp.intelligentplant.service.api.DmonValueService;
+
+@Service
+public class DmonValueServiceImpl implements DmonValueService {
+	
+	@Resource
+	private IDmonValueDao dmonValueDao;
+	
+	@Override
+	@Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+	public void saveDmonValue(DmonValue dmonValue) {
+		dmonValueDao.save(dmonValue);
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
+	public void deleteDmonValue(Long id) {
+		dmonValueDao.delete(id);
+	}
+	
+	@Override
+	@Transactional(readOnly = true)
+	public Page<DmonValue> findDmonValueByPage(Pageable pageable) {
+		Page<DmonValue> page = dmonValueDao.findAll(pageable);
+		return page;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<DmonValue> listDmonValue() {
+		return dmonValueDao.findAll();
+	}
+
+}
